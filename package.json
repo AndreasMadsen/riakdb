@@ -1,0 +1,28 @@
+{
+  "name": "riak-client",
+  "description": "protocol buffer backed riak client",
+  "version": "0.2.0",
+  "author": "Andreas Madsen <amwebdk@gmail.com>",
+  "main": "./lib/client.js",
+  "scripts": {
+    "test": "tap test/*.js"
+  },
+  "repository" : {
+    "type": "git",
+    "url": "git://github.com/AndreasMadsen/riak-client.git"
+  },
+  "keywords": [
+    "riak",
+    "client",
+    "buffer",
+    "stream"
+  ],
+  "dependencies": {
+    "protocol-buffers": "2.4.x",
+    "util-extend": "1.0.x"
+  },
+  "devDependencies": {
+    "tap": "0.4.x"
+  },
+  "license": "MIT"
+}
