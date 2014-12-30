@@ -9,7 +9,30 @@ var settings = {
   timeout: 1000
 };
 
-test('send', function (t) {
+test('open flag', function (t) {
+  var node = new Node({
+    address: '127.0.0.1',
+    port: 8087
+  }, settings);
+
+  t.strictEqual(node.open, false);
+  node.connect();
+  t.strictEqual(node.open, false);
+
+  node.once('connect', function () {
+    t.strictEqual(node.open, true);
+
+    node.close();
+    t.strictEqual(node.open, false);
+
+    node.once('close', function () {
+      t.strictEqual(node.open, false);
+      t.end();
+    });
+  });
+});
+
+test('ping by simple message', function (t) {
   var node = new Node({
     address: '127.0.0.1',
     port: 8087
@@ -21,10 +44,13 @@ test('send', function (t) {
     node.message(types.RpbPingReq, {}, function (err, data) {
       t.equal(err, null);
       t.equal(data, null);
+      t.strictEqual(node.inuse, false);
 
       node.close();
       node.once('close', t.end.bind(t));
     });
+
+    t.strictEqual(node.inuse, true);
   });
 });
 
