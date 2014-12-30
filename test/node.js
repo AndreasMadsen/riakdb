@@ -14,10 +14,11 @@ test('send', function (t) {
     address: '127.0.0.1',
     port: 8087
   }, settings);
+  node.connect();
 
   node.once('connect', function () {
 
-    node.send(types.RpbPingReq, {}, function (err, data) {
+    node.message(types.RpbPingReq, {}, function (err, data) {
       t.equal(err, null);
       t.equal(data, null);
 
