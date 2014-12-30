@@ -1,6 +1,8 @@
 'use strict';
 
 var test = require('tap').test;
+var async = require('async');
+var util = require('util');
 
 var Node = require('../lib/node.js');
 var types = require('../lib/types.js');
@@ -72,4 +74,61 @@ test('error for multiply request', function (t) {
   });
 });
 
-test('stream');
+var objects = [
+  {key: 'A', content: 'Message A'},
+  {key: 'B', content: 'Message B'},
+  {key: 'C', content: 'Message C'}
+];
+
+test('store three objects', function (t) {
+  var node = new Node(settings);
+  node.connect();
+
+  node.once('connect', function () {
+
+    async.mapSeries(objects, function (val, done) {
+      node.message(types.RpbPutReq, {
+        bucket: new Buffer('riak-client-test'),
+        key: new Buffer(val.key),
+        content: { value: new Buffer(val.content) }
+      }, done);
+    }, function (err, responses) {
+      t.equal(err, null);
+      t.deepEqual(responses, [
+        { content: [], vclock: null, key: null },
+        { content: [], vclock: null, key: null },
+        { content: [], vclock: null, key: null }
+      ]);
+
+      node.close();
+      node.once('close', t.end.bind(t));
+    });
+  });
+});
+
+test('fetch three objects', function (t) {
+  var node = new Node(settings);
+  node.connect();
+
+  node.once('connect', function () {
+
+    async.mapSeries(objects, function (val, done) {
+      node.message(types.RpbGetReq, {
+        bucket: new Buffer('riak-client-test'),
+        key: new Buffer(val.key)
+      }, done);
+    }, function (err, responses) {
+      t.equal(err, null);
+
+      t.deepEqual(responses.map(function (response, i) {
+        return {
+          key: objects[i].key,
+          content: response.content[0].value.toString()
+        };
+      }), objects);
+
+      node.close();
+      node.once('close', t.end.bind(t));
+    });
+  });
+});
