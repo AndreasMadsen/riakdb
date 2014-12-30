@@ -6,14 +6,12 @@ var Node = require('../lib/node.js');
 var types = require('../lib/types.js');
 
 var settings = {
-  timeout: 1000
+  address: '127.0.0.1',
+  port: 8087
 };
 
 test('open flag', function (t) {
-  var node = new Node({
-    address: '127.0.0.1',
-    port: 8087
-  }, settings);
+  var node = new Node(settings);
 
   t.strictEqual(node.open, false);
   node.connect();
@@ -33,10 +31,7 @@ test('open flag', function (t) {
 });
 
 test('ping by simple message', function (t) {
-  var node = new Node({
-    address: '127.0.0.1',
-    port: 8087
-  }, settings);
+  var node = new Node(settings);
   node.connect();
 
   node.once('connect', function () {
@@ -55,10 +50,7 @@ test('ping by simple message', function (t) {
 });
 
 test('error for multiply request', function (t) {
-  var node = new Node({
-    address: '127.0.0.1',
-    port: 8087
-  }, settings);
+  var node = new Node(settings);
   node.connect();
 
   node.once('connect', function () {
