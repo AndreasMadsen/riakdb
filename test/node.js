@@ -54,4 +54,30 @@ test('ping by simple message', function (t) {
   });
 });
 
+test('error for multiply request', function (t) {
+  var node = new Node({
+    address: '127.0.0.1',
+    port: 8087
+  }, settings);
+  node.connect();
+
+  node.once('connect', function () {
+    var error = null;
+
+    node.message(types.RpbPingReq, {}, function (err, data) {
+      t.equal(err, null);
+      t.equal(data, null);
+      t.equal(error.message, 'node is in use');
+      t.strictEqual(node.inuse, false);
+
+      node.close();
+      node.once('close', t.end.bind(t));
+    });
+
+    node.message(types.RpbPingReq, {}, function (err) {
+      error = err;
+    });
+  });
+});
+
 test('stream');
