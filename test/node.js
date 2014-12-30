@@ -2,7 +2,6 @@
 
 var test = require('tap').test;
 var async = require('async');
-var util = require('util');
 
 var Node = require('../lib/node.js');
 var types = require('../lib/types.js');
@@ -35,7 +34,6 @@ test('open flag', function (t) {
 test('ping by simple message', function (t) {
   var node = new Node(settings);
   node.connect();
-
   node.once('connect', function () {
 
     node.message(types.RpbPingReq, {}, function (err, data) {
@@ -54,7 +52,6 @@ test('ping by simple message', function (t) {
 test('error for multiply request', function (t) {
   var node = new Node(settings);
   node.connect();
-
   node.once('connect', function () {
     var error = null;
 
@@ -83,7 +80,6 @@ var objects = [
 test('store three objects', function (t) {
   var node = new Node(settings);
   node.connect();
-
   node.once('connect', function () {
 
     async.mapSeries(objects, function (val, done) {
@@ -109,7 +105,6 @@ test('store three objects', function (t) {
 test('fetch three objects', function (t) {
   var node = new Node(settings);
   node.connect();
-
   node.once('connect', function () {
 
     async.mapSeries(objects, function (val, done) {
