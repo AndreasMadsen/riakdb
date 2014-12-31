@@ -8,7 +8,7 @@ var MessageParser = require('../lib/parser.js');
 
 function constructMessage(type, data) {
   var length = protocol[type].encodingLength(data) + 1;
-  var buffer = new Buffer(5 + length);
+  var buffer = new Buffer(4 + length);
   // message length
   buffer.writeUInt32BE(length, 0, true);
   // message size
@@ -168,5 +168,46 @@ test('two complete message', function (t) {
   });
 
   parser.write(Buffer.concat([bufferA, bufferB]));
+  parser.end();
+});
+
+test('multiply messages (regression)', function (t) {
+  var parser = new MessageParser();
+
+  parser.pipe(endpoint({ objectMode: true }, function (err, items) {
+    t.equal(err, null);
+    t.deepEqual(buffer2str(items), [{
+      type: 18,
+      data: {
+        keys: ['A'],
+        done: false
+      }
+    }, {
+      type: 18,
+      data: {
+        keys: ['B'],
+        done: false
+      }
+    }, {
+      type: 18,
+      data: {
+        keys: ['C'],
+        done: false
+      }
+    }, {
+      type: 18,
+      data: {
+        keys: [],
+        done: true
+      }
+    }]);
+    t.end();
+  }));
+
+  parser.write(new Buffer([0x00, 0x00, 0x00, 0x04, 0x12, 0x0a, 0x01, 0x41]));
+  parser.write(new Buffer([0x00, 0x00, 0x00, 0x04, 0x12, 0x0a, 0x01, 0x42,
+                           0x00, 0x00, 0x00, 0x04, 0x12, 0x0a, 0x01, 0x43,
+                           0x00, 0x00, 0x00, 0x03, 0x12, 0x10, 0x01      ]));
+
   parser.end();
 });

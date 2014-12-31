@@ -2,6 +2,7 @@
 
 var test = require('tap').test;
 var async = require('async');
+var endpoint = require('endpoint');
 
 var Node = require('../lib/node.js');
 var types = require('../lib/types.js');
@@ -121,6 +122,77 @@ test('fetch three objects', function (t) {
           content: response.content[0].value.toString()
         };
       }), objects);
+
+      node.close();
+      node.once('close', t.end.bind(t));
+    });
+  });
+});
+
+test('read keys by stream', function (t) {
+  var node = new Node(settings);
+  node.connect();
+  node.once('connect', function () {
+
+    node.stream(types.RpbListKeysReq, {
+      bucket: new Buffer('riak-client-test')
+    }).pipe(endpoint({objectMode: true}, function (err, content) {
+      t.equal(err, null);
+      t.ok(content.length > 1, 'more than one response messsage');
+
+      var keys = Array.prototype.concat.apply([],
+        content.map(function (data) { return data.keys; })
+      );
+
+      t.deepEqual(keys.map(function (buf) { return buf.toString(); }).sort(), [
+        'A', 'B', 'C'
+      ]);
+
+      node.close();
+      node.once('close', t.end.bind(t));
+    }));
+  });
+});
+
+test('error for multiply requests', function (t) {
+  var node = new Node(settings);
+  node.connect();
+  node.once('connect', function () {
+    var error = null;
+
+    node.stream(types.RpbListKeysReq, {
+      bucket: new Buffer('riak-client-test')
+    }).pipe(endpoint({objectMode: true}, function (err, content) {
+      t.equal(err, null);
+      t.ok(content.length > 1, 'more than one response messsage');
+      t.equal(error.message, 'node is in use');
+
+      node.close();
+      node.once('close', t.end.bind(t));
+    }));
+
+    node.stream(types.RpbListKeysReq, {
+      bucket: new Buffer('riak-client-test')
+    }).pipe(endpoint({objectMode: true}, function (err, content) {
+      t.equal(content.length, 0);
+      error = err;
+    }));
+  });
+});
+
+test('remove three objects', function (t) {
+  var node = new Node(settings);
+  node.connect();
+  node.once('connect', function () {
+
+    async.mapSeries(objects, function (val, done) {
+      node.message(types.RpbDelReq, {
+        bucket: new Buffer('riak-client-test'),
+        key: new Buffer(val.key)
+      }, done);
+    }, function (err, responses) {
+      t.equal(err, null);
+      t.deepEqual(responses, [null, null, null]);
 
       node.close();
       node.once('close', t.end.bind(t));
