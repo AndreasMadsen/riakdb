@@ -86,6 +86,25 @@ test('error for multiply request', function (t) {
   });
 });
 
+test('riak errors in the single message case', function (t) {
+  var node = new Node(settings);
+  node.connect();
+  node.once('connect', function () {
+    message(node, types.RpbGetBucketReq, {
+      bucket: new Buffer('riak-client-test'),
+      type: new Buffer('missing-bucket-type')
+    }, function (err) {
+      t.equal(err.name, 'Riak Error');
+      t.equal(err.message, "No bucket-type named 'missing-bucket-type'");
+      t.equal(err.code, 0);
+      t.equal(typeof err.stack, 'string');
+
+      node.close();
+      node.once('close', t.end.bind(t));
+    });
+  });
+});
+
 var objects = [
   {key: 'A', content: 'Message A'},
   {key: 'B', content: 'Message B'},
@@ -190,6 +209,25 @@ test('error for multiply requests', function (t) {
     }).pipe(endpoint({objectMode: true}, function (err, content) {
       t.equal(content.length, 0);
       error = err;
+    }));
+  });
+});
+
+test('riak errors in the stream case', function (t) {
+  var node = new Node(settings);
+  node.connect();
+  node.once('connect', function () {
+    stream(node, types.RpbListKeysReq, {
+      bucket: new Buffer('riak-client-test'),
+      type: new Buffer('missing-bucket-type')
+    }).pipe(endpoint({objectMode: true}, function (err) {
+      t.equal(err.name, 'Riak Error');
+      t.equal(err.message, "No bucket-type named 'missing-bucket-type'");
+      t.equal(err.code, 0);
+      t.equal(typeof err.stack, 'string');
+
+      node.close();
+      node.once('close', t.end.bind(t));
     }));
   });
 });
