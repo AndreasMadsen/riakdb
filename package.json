@@ -1,6 +1,6 @@
 {
-  "name": "riak-client",
-  "description": "protocol buffer backed riak client",
+  "name": "riakdb",
+  "description": "riak client with stream interfaces using protocol buffers",
   "version": "0.2.0",
   "author": "Andreas Madsen <amwebdk@gmail.com>",
   "main": "./lib/client.js",
@@ -9,12 +9,13 @@
   },
   "repository" : {
     "type": "git",
-    "url": "git://github.com/AndreasMadsen/riak-client.git"
+    "url": "git://github.com/AndreasMadsen/riakdb.git"
   },
   "keywords": [
     "riak",
     "client",
-    "buffer",
+    "pool",
+    "ptotocol buffer",
     "stream"
   ],
   "dependencies": {
@@ -22,7 +23,9 @@
     "util-extend": "1.0.x"
   },
   "devDependencies": {
-    "tap": "0.4.x"
+    "tap": "0.4.x",
+    "async": "0.9.x",
+    "endpoint": "0.4.x"
   },
   "license": "MIT"
 }
