@@ -5,7 +5,7 @@
   "author": "Andreas Madsen <amwebdk@gmail.com>",
   "main": "./lib/client.js",
   "scripts": {
-    "test": "tap test/*.js"
+    "test": "tap test/simple/*.js"
   },
   "repository" : {
     "type": "git",

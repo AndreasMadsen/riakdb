@@ -5,9 +5,9 @@ var async = require('async');
 var endpoint = require('endpoint');
 var PassThrough = require('stream').PassThrough;
 
-var jobs = require('../lib/job.js');
-var Node = require('../lib/node.js');
-var types = require('../lib/types.js');
+var jobs = require('../../lib/job.js');
+var Node = require('../../lib/node.js');
+var types = require('../../lib/types.js');
 
 var settings = {
   address: '127.0.0.1',

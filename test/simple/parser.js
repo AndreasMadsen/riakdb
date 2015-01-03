@@ -3,8 +3,8 @@
 var test = require('tap').test;
 var endpoint = require('endpoint');
 
-var protocol = require('../lib/protocol.js');
-var MessageParser = require('../lib/parser.js');
+var protocol = require('../../lib/protocol.js');
+var MessageParser = require('../../lib/parser.js');
 
 function constructMessage(type, data) {
   var length = protocol[type].encodingLength(data) + 1;
