@@ -50,11 +50,27 @@ test('ping by simple message', function (t) {
   var node = new Node(settings);
   node.connect();
   node.once('connect', function () {
+    var usedFired = false;
+    var freeFired = false;
+
+    node.once('used', function () {
+      usedFired = true;
+      t.equal(freeFired, false);
+      t.equal(node.inuse, true);
+    });
+
+    node.once('free', function () {
+      freeFired = true;
+      t.equal(usedFired, true);
+      t.equal(node.inuse, false);
+    });
 
     message(node, types.RpbPingReq, {}, function (err, data) {
       t.equal(err, null);
       t.equal(data, null);
       t.strictEqual(node.inuse, false);
+      t.equal(usedFired, true);
+      t.equal(freeFired, true);
 
       node.close();
       node.once('close', t.end.bind(t));
