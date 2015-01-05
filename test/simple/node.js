@@ -80,7 +80,7 @@ test('ping by simple message', function (t) {
   });
 });
 
-test('error for multiply request', function (t) {
+test('error for multiply request using message', function (t) {
   var node = new Node(settings);
   node.connect();
   node.once('connect', function () {
@@ -99,6 +99,31 @@ test('error for multiply request', function (t) {
     message(node, types.RpbPingReq, {}, function (err) {
       error = err;
     });
+  });
+});
+
+test('error in callback for connection error', function (t) {
+  var node = new Node({ address: '127.0.0.1', port: 0xBAD });
+  node.connect();
+
+  var nodeError = null;
+
+  message(node, types.RpbPingReq, {}, function (err, data) {
+    // Expect the callback to fire becore the event
+    t.equal(nodeError, null);
+    t.equal(data, null);
+
+    process.nextTick(function () {
+      t.equal(err.message, 'connect ECONNREFUSED');
+      t.equal(nodeError.message, 'connect ECONNREFUSED');
+
+      node.close();
+      node.once('close', t.end.bind(t));
+    });
+  });
+
+  node.once('error', function (err) {
+    nodeError = err;
   });
 });
 
@@ -203,7 +228,7 @@ test('read keys by stream', function (t) {
   });
 });
 
-test('error for multiply requests', function (t) {
+test('error for multiply requests using stream', function (t) {
   var node = new Node(settings);
   node.connect();
   node.once('connect', function () {
@@ -248,6 +273,33 @@ test('riak errors in the stream case', function (t) {
   });
 });
 
+test('error in stream for connection error', function (t) {
+  var node = new Node({ address: '127.0.0.1', port: 0xBAD });
+  node.connect();
+
+  var nodeError = null;
+
+  stream(node, types.RpbListKeysReq, {
+    bucket: new Buffer('riak-client-test'),
+    type: new Buffer('missing-bucket-type')
+  }).pipe(endpoint({objectMode: true}, function (err) {
+    // Expect the stream event to fire becore the node event
+    t.equal(nodeError, null);
+
+    process.nextTick(function () {
+      t.equal(err.message, 'connect ECONNREFUSED');
+      t.equal(nodeError.message, 'connect ECONNREFUSED');
+
+      node.close();
+      node.once('close', t.end.bind(t));
+    });
+  }));
+
+  node.once('error', function (err) {
+    nodeError = err;
+  });
+});
+
 test('remove three objects', function (t) {
   var node = new Node(settings);
   node.connect();
@@ -265,5 +317,17 @@ test('remove three objects', function (t) {
       node.close();
       node.once('close', t.end.bind(t));
     });
+  });
+});
+
+test('error at connection without active job', function (t) {
+  var node = new Node({ address: '127.0.0.1', port: 0xBAD });
+  node.connect();
+
+  node.once('error', function (err) {
+    t.equal(err.message, 'connect ECONNREFUSED');
+
+    node.close();
+    node.once('close', t.end.bind(t));
   });
 });
