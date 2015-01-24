@@ -146,6 +146,19 @@ test('riak errors in the single message case', function (t) {
   });
 });
 
+test('message requests will fail when closeing', function (t) {
+  var node = new Node(settings);
+  node.connect();
+
+  message(node, types.RpbListBucketsReq, {}, function (err, response) {
+    t.equal(err.message, 'connection closed');
+    t.equal(response, null);
+
+    node.once('close', t.end.bind(t));
+  });
+  node.close();
+});
+
 var objects = [
   {key: 'A', content: 'Message A'},
   {key: 'B', content: 'Message B'},
@@ -271,6 +284,21 @@ test('riak errors in the stream case', function (t) {
       node.once('close', t.end.bind(t));
     }));
   });
+});
+
+test('stream requests will fail when closeing', function (t) {
+  var node = new Node(settings);
+  node.connect();
+
+  stream(node, types.RpbListKeysReq, {
+    bucket: new Buffer('riak-client-test')
+  }).pipe(endpoint({objectMode: true}, function (err) {
+    t.equal(err.message, 'connection closed');
+
+    node.once('close', t.end.bind(t));
+  }));
+
+  node.close();
 });
 
 test('error in stream for connection error', function (t) {
