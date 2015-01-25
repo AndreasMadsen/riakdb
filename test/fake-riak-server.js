@@ -8,49 +8,60 @@ var types = require('../lib/types.js');
 var protocol = require('../lib/protocol.js');
 var MessageParser = require('../lib/parser.js');
 
-function FakeRiak(port) {
+function FakeRiakServer(port) {
   events.EventEmitter.call(this);
 
   this.port = port;
   this.connections = 0;
+
+  this.sockets = [];
+
   this._server = new net.Server();
   this._server.once('listening', this.emit.bind(this, 'listening'));
   this._server.once('close', this.emit.bind(this, 'close'));
   this._server.on('connection', this._connection.bind(this));
 }
-util.inherits(FakeRiak, events.EventEmitter);
-module.exports = FakeRiak;
+util.inherits(FakeRiakServer, events.EventEmitter);
+module.exports = FakeRiakServer;
 
-FakeRiak.prototype._connection = function (socket) {
+FakeRiakServer.prototype._connection = function (socket) {
   var self = this;
 
   // Diable Nagle Algorithm
   socket.setNoDelay(true);
 
-  // Maintain connection counter
+  // Maintain connection counter and set ended flag
   this.connections += 1;
+  var ended = false;
   socket.once('close', function () {
     self.connections -= 1;
+    self.sockets.splice(self.sockets.indexOf(socket));
+    ended = true;
   });
+  this.sockets.push(socket);
 
   // Handle requests
   var inuse = false;
   socket.pipe(new MessageParser()).on('data', function (request) {
-    // Fail on multiply requests
-    if (inuse) {
-      socket.write(encode(types.RpbErrorResp, {
-        errmsg: new Buffer('Multply requests not supported'),
-        errcode: 0
-      }));
-      return;
-    }
+    setTimeout(function () {
+      if (ended) return;
 
-    // Handle ping request, make a small delay
-    if (request.type === types.RpbPingReq) {
-      socket.write(encode(types.RpbPingResp, {}), function () {
-        inuse = false;
-      });
-    }
+      // Fail on multiply requests
+      if (inuse) {
+        socket.write(encode(types.RpbErrorResp, {
+          errmsg: new Buffer('Multply requests not supported'),
+          errcode: 0
+        }));
+        return;
+      }
+
+      // Handle ping request, make a small delay
+      if (request.type === types.RpbPingReq) {
+        socket.write(encode(types.RpbPingResp, {}), function () {
+          inuse = false;
+        });
+      }
+    }, 25);
   });
 };
 
@@ -68,10 +79,10 @@ function encode(type, data) {
   return buffer;
 }
 
-FakeRiak.prototype.listen = function () {
+FakeRiakServer.prototype.listen = function () {
   this._server.listen(this.port, '127.0.0.1');
 };
 
-FakeRiak.prototype.close = function () {
+FakeRiakServer.prototype.close = function () {
   this._server.close();
 };
