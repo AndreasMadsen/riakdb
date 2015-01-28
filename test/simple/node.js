@@ -80,6 +80,31 @@ test('ping by simple message', function (t) {
   });
 });
 
+test('last request timestamp', function (t) {
+  var node = new Node(settings);
+
+  function within(now) {
+    return Math.abs(node.lastRequest - now) <= 5;
+  }
+  t.ok(within(Date.now()), 'initial lastRequest set now');
+
+  node.connect();
+  node.once('connect', function () {
+
+    setTimeout(function () {
+      message(node, types.RpbPingReq, {}, function (err, data) {
+        t.equal(err, null);
+        t.equal(data, null);
+
+        t.ok(within(Date.now()), 'lastRequest set at response');
+
+        node.close();
+        node.once('close', t.end.bind(t));
+      });
+    }, 50);
+  });
+});
+
 test('error for multiply request using message', function (t) {
   var node = new Node(settings);
   node.connect();
