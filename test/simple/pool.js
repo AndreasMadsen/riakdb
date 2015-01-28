@@ -53,14 +53,14 @@ test('requests will fail after closed', function (t) {
   var pool = new Pool(settings);
   pool.connect();
 
-  message(pool, types.RpbPingReq, {}, function (err, response) {
-    t.equal(err, null);
-    t.equal(response, null);
+  message(pool, types.RpbPingReq, {}, function (err1, response1) {
+    t.equal(err1, null);
+    t.equal(response1, null);
 
     pool.close();
-    message(pool, types.RpbPingReq, {}, function (err, response) {
-      t.equal(err.message, 'connection closed');
-      t.equal(response, null);
+    message(pool, types.RpbPingReq, {}, function (err2, response2) {
+      t.equal(err2.message, 'connection closed');
+      t.equal(response2, null);
 
       pool.once('close', t.end.bind(t));
     });

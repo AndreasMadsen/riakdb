@@ -5,7 +5,7 @@
   "author": "Andreas Madsen <amwebdk@gmail.com>",
   "main": "./lib/client.js",
   "scripts": {
-    "test": "tap test/simple/*.js"
+    "test": "tap test/simple/*.js && eslint -f compact lib test"
   },
   "repository" : {
     "type": "git",
@@ -25,6 +25,7 @@
   "devDependencies": {
     "tap": "0.4.x",
     "async": "0.9.x",
+    "eslint": "0.13.x",
     "endpoint": "0.4.x"
   },
   "license": "MIT"
