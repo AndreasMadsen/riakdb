@@ -202,7 +202,7 @@ test('store three objects', function (t) {
         content: { value: new Buffer(val.content) }
       }, done);
     }, function (err, responses) {
-      t.equal(err, null);
+      t.equal(err || null, null);
       t.deepEqual(responses, [
         { content: [], vclock: null, key: null },
         { content: [], vclock: null, key: null },
@@ -226,7 +226,7 @@ test('fetch three objects', function (t) {
         key: new Buffer(val.key)
       }, done);
     }, function (err, responses) {
-      t.equal(err, null);
+      t.equal(err || null, null);
 
       t.deepEqual(responses.map(function (response, i) {
         return {
@@ -364,7 +364,7 @@ test('remove three objects', function (t) {
         key: new Buffer(val.key)
       }, done);
     }, function (err, responses) {
-      t.equal(err, null);
+      t.equal(err || null, null);
       t.deepEqual(responses, [null, null, null]);
 
       node.close();

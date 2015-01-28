@@ -74,7 +74,7 @@ test('connections are reused', function (t) {
   async.timesSeries(2, function (index, done) {
     message(pool, types.RpbPingReq, {}, done);
   }, function (err, responses) {
-    t.equal(err, null);
+    t.equal(err || null, null);
     t.deepEqual(responses, [null, null]);
     t.equal(pool.connections, 1);
 
@@ -90,7 +90,7 @@ test('with pool two simultaneous messages are possibol', function (t) {
   async.times(2, function (index, done) {
     message(pool, types.RpbPingReq, {}, done);
   }, function (err, responses) {
-    t.equal(err, null);
+    t.equal(err || null, null);
     t.deepEqual(responses, [null, null]);
     t.equal(pool.connections, 2);
 
@@ -156,7 +156,7 @@ test('no more nodes than max connections allow', function (t) {
   async.times(10, function (index, done) {
     message(pool, types.RpbPingReq, {}, done);
   }, function (err, responses) {
-    t.equal(err, null);
+    t.equal(err || null, null);
     t.deepEqual(responses.length, 10);
     t.equal(pool.connections, 5);
 
@@ -181,7 +181,7 @@ test('if more than min connections, some closes after timeout', function (t) {
     async.times(3, function (index, done) {
       message(pool, types.RpbPingReq, {}, done);
     }, function (err, responses) {
-      t.equal(err, null);
+      t.equal(err || null, null);
       t.deepEqual(responses.length, 3);
       t.equal(pool.connections, 3);
 
@@ -197,7 +197,7 @@ test('if more than min connections, some closes after timeout', function (t) {
     async.times(2, function (index, done) {
       message(pool, types.RpbPingReq, {}, done);
     }, function (err, responses) {
-      t.equal(err, null);
+      t.equal(err || null, null);
       t.deepEqual(responses.length, 2);
       t.equal(pool.connections, 3);
 
@@ -208,10 +208,10 @@ test('if more than min connections, some closes after timeout', function (t) {
   // Called after 100 ms, one connection should be closed
   function firstClosed() {
     t.equal(pool.connections, 2);
-    setTimeout(lastClosed, 55);
+    setTimeout(lastClosed, 60);
   }
 
-  // Called after 15 ms, only the minConnections should exists
+  // Called after 150 ms, only the minConnections should exists
   function lastClosed() {
     t.equal(pool.connections, 1);
 

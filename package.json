@@ -23,7 +23,7 @@
     "util-extend": "1.0.x"
   },
   "devDependencies": {
-    "tap": "0.4.x",
+    "tap": "0.5.x",
     "async": "0.9.x",
     "eslint": "0.13.x",
     "endpoint": "0.4.x"
