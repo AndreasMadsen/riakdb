@@ -100,7 +100,7 @@ test('with pool two simultaneous messages are possibol', function (t) {
 });
 
 test('connections are restored on end', function (t) {
-  var pool = new Pool(settings);
+  var pool = new Pool({ minConnections: 1, nodes: settings.nodes });
   pool.connect();
 
   message(pool, types.RpbPingReq, {}, function (err, response) {
@@ -118,7 +118,9 @@ test('connections are restored on end', function (t) {
 });
 
 test('connections are restored on error', function (t) {
-  var pool = new Pool(settings);
+  // TODO: actually there is no error here, but I can't come up with
+  // a simple way of simulating an error
+  var pool = new Pool({ minConnections: 1, nodes: settings.nodes });
   pool.connect();
 
   message(pool, types.RpbPingReq, {}, function (err, response) {
@@ -163,7 +165,60 @@ test('no more nodes than max connections allow', function (t) {
   });
 });
 
-//test('if more than min connections, some closes after timeout');
+test('if more than min connections, some closes after timeout', function (t) {
+  var pool = new Pool({
+    minConnections: 1,
+    connectionTimeout: 100,
+    nodes: settings.nodes
+  });
+  pool.connect();
+
+  // TODO: replace with connection event
+  setTimeout(initializeConnections, 10);
+
+  // Do 3 requests, such there will be 3 connections will be initialized
+  function initializeConnections() {
+    async.times(3, function (index, done) {
+      message(pool, types.RpbPingReq, {}, done);
+    }, function (err, responses) {
+      t.equal(err, null);
+      t.deepEqual(responses.length, 3);
+      t.equal(pool.connections, 3);
+
+      setTimeout(prolongConnections, 55);
+    });
+  }
+
+  // Called after 50 ms, and do two requests such that only one connection
+  // will close after 50 more ms.
+  function prolongConnections() {
+    t.equal(pool.connections, 3);
+
+    async.times(2, function (index, done) {
+      message(pool, types.RpbPingReq, {}, done);
+    }, function (err, responses) {
+      t.equal(err, null);
+      t.deepEqual(responses.length, 2);
+      t.equal(pool.connections, 3);
+
+      setTimeout(firstClosed, 55);
+    });
+  }
+
+  // Called after 100 ms, one connection should be closed
+  function firstClosed() {
+    t.equal(pool.connections, 2);
+    setTimeout(lastClosed, 55);
+  }
+
+  // Called after 15 ms, only the minConnections should exists
+  function lastClosed() {
+    t.equal(pool.connections, 1);
+
+    pool.close();
+    pool.once('close', t.end.bind(t));
+  }
+});
 
 test('close the fake cluster', function (t) {
   cluster.close();
