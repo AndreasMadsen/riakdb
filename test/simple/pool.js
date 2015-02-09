@@ -137,16 +137,36 @@ test('connections are restored on error', function (t) {
   });
 });
 
+test('connect event with no minConnections', function (t) {
+  var pool = new Pool(settings);
+
+  pool.connect();
+  var connected = false;
+  pool.once('connect', function () {
+    connected = true;
+  });
+
+  // the connect event should emit on nextTick so immediate should be safe
+  setImmediate(function () {
+    console.log('connect event');
+    t.equal(connected, true);
+
+    // Empty close
+    pool.close();
+    pool.once('close', t.end.bind(t));
+  });
+});
+
 test('min connections are initialized at startup', function (t) {
   var pool = new Pool({ minConnections: 2, nodes: settings.nodes });
   pool.connect();
 
-  setTimeout(function () {
+  pool.once('connect', function () {
     t.equal(pool.connections, 2);
 
     pool.close();
     pool.once('close', t.end.bind(t));
-  }, 50);
+  });
 });
 
 test('no more nodes than max connections allow', function (t) {
@@ -174,7 +194,7 @@ test('if more than min connections, some closes after timeout', function (t) {
   pool.connect();
 
   // TODO: replace with connection event
-  setTimeout(initializeConnections, 10);
+  pool.once('connect', initializeConnections);
 
   // Do 3 requests, such there will be 3 connections will be initialized
   function initializeConnections() {
