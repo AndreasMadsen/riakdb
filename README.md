@@ -8,6 +8,28 @@
 npm install riakdb
 ```
 
+## Example
+
+```javascript
+var riakdb = require('riakdb');
+var client = riakdb({
+  nodes: [
+    address: '127.0.0.1',
+    port: 8087
+  ]
+});
+
+client.connect();
+client.keys({ bucket: 'examples' })
+  .on('data', function (key) {
+    console.log(key);
+  })
+  .once('end', function () {
+    client.close();
+  });
+
+```
+
 ## Documentation
 
 The documentation is separated intro three parts:
@@ -125,11 +147,59 @@ client.del({
 
 ### Low level interface
 
-| Method         | Response type | Protocol |
-|:-------------- |:------------- |:-------- |
-| client.low.get | callback      | [RpbGetReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/fetch-object/) |
-| client.low.put | callback      | [RpbPutReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/store-object/) |
-| client.low.del | callback      | [RpbDelReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/delete-object/) |
+TODO: Document error behaviour and response type patterns
+
+<table>
+<thead>
+  <tr>
+    <th> Name </th>
+    <th> Method </th>
+    <th> Response Type </th>
+    <th> Protocol </th>
+  <tr>
+</thead>
+<tbody>
+  <tr>
+    <td colspan=3> **Bucket Operations** </td>
+  </tr>
+  <tr>
+    <td colspan=3> **Object/Key Operations** </td>
+  </tr>
+  <tr>
+    <td> Fetch Object </td>
+    <td> `client.low.get` </td>
+    <td> callback </td>
+    <td> [RpbGetReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/fetch-object/) </td>
+  </tr>
+  <tr>
+    <td>  Store Object </td>
+    <td> `client.low.put` </td>
+    <td> callback </td>
+    <td> [RpbPutReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/store-object/) </td>
+  </tr>
+  <tr>
+    <td> Delete Object </td>
+    <td> `client.low.del` </td>
+    <td> callback </td>
+    <td> [RpbDelReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/delete-object/) </td>
+  </tr>
+  <tr>
+    <td colspan=3> **Query Operations** </td>
+  </tr>
+  <tr>
+    <td colspan=3> **Server Operations** </td>
+  </tr>
+  <tr>
+    <td colspan=3> **Bucket Type Operations** </td>
+  </tr>
+  <tr>
+    <td colspan=3> **Data Type Operations** </td>
+  </tr>
+  <tr>
+    <td colspan=3> **Yokozuna Operations** </td>
+  </tr>
+</tbody>
+</table>
 
 ## License
 
