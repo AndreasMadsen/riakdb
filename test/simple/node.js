@@ -93,10 +93,10 @@ test('last request timestamp', function (t) {
 
     setTimeout(function () {
       message(node, types.RpbPingReq, {}, function (err, data) {
+        var now = Date.now();
         t.equal(err, null);
         t.equal(data, null);
-
-        t.ok(within(Date.now()), 'lastRequest set at response');
+        t.ok(within(now), 'lastRequest set at response');
 
         node.close();
         node.once('close', t.end.bind(t));
@@ -157,7 +157,7 @@ test('riak errors in the single message case', function (t) {
   node.connect();
   node.once('connect', function () {
     message(node, types.RpbGetBucketReq, {
-      bucket: new Buffer('riak-client-test'),
+      bucket: new Buffer('riakdb-node-test'),
       type: new Buffer('missing-bucket-type')
     }, function (err) {
       t.equal(err.name, 'Riak Error');
@@ -197,7 +197,7 @@ test('store three objects', function (t) {
 
     async.mapSeries(objects, function (val, done) {
       message(node, types.RpbPutReq, {
-        bucket: new Buffer('riak-client-test'),
+        bucket: new Buffer('riakdb-node-test'),
         key: new Buffer(val.key),
         content: { value: new Buffer(val.content) }
       }, done);
@@ -222,7 +222,7 @@ test('fetch three objects', function (t) {
 
     async.mapSeries(objects, function (val, done) {
       message(node, types.RpbGetReq, {
-        bucket: new Buffer('riak-client-test'),
+        bucket: new Buffer('riakdb-node-test'),
         key: new Buffer(val.key)
       }, done);
     }, function (err, responses) {
@@ -247,7 +247,7 @@ test('read keys by stream', function (t) {
   node.once('connect', function () {
 
     stream(node, types.RpbListKeysReq, {
-      bucket: new Buffer('riak-client-test')
+      bucket: new Buffer('riakdb-node-test')
     }).pipe(endpoint({objectMode: true}, function (err, content) {
       t.equal(err, null);
       t.ok(content.length > 1, 'more than one response messsage');
@@ -273,7 +273,7 @@ test('error for multiply requests using stream', function (t) {
     var error = null;
 
     stream(node, types.RpbListKeysReq, {
-      bucket: new Buffer('riak-client-test')
+      bucket: new Buffer('riakdb-node-test')
     }).pipe(endpoint({objectMode: true}, function (err, content) {
       t.equal(err, null);
       t.ok(content.length > 1, 'more than one response messsage');
@@ -284,7 +284,7 @@ test('error for multiply requests using stream', function (t) {
     }));
 
     stream(node, types.RpbListKeysReq, {
-      bucket: new Buffer('riak-client-test')
+      bucket: new Buffer('riakdb-node-test')
     }).pipe(endpoint({objectMode: true}, function (err, content) {
       t.equal(content.length, 0);
       error = err;
@@ -297,7 +297,7 @@ test('riak errors in the stream case', function (t) {
   node.connect();
   node.once('connect', function () {
     stream(node, types.RpbListKeysReq, {
-      bucket: new Buffer('riak-client-test'),
+      bucket: new Buffer('riakdb-node-test'),
       type: new Buffer('missing-bucket-type')
     }).pipe(endpoint({objectMode: true}, function (err) {
       t.equal(err.name, 'Riak Error');
@@ -316,7 +316,7 @@ test('stream requests will fail when closeing', function (t) {
   node.connect();
 
   stream(node, types.RpbListKeysReq, {
-    bucket: new Buffer('riak-client-test')
+    bucket: new Buffer('riakdb-node-test')
   }).pipe(endpoint({objectMode: true}, function (err) {
     t.equal(err.message, 'connection closed');
 
@@ -333,7 +333,7 @@ test('error in stream for connection error', function (t) {
   var nodeError = null;
 
   stream(node, types.RpbListKeysReq, {
-    bucket: new Buffer('riak-client-test'),
+    bucket: new Buffer('riakdb-node-test'),
     type: new Buffer('missing-bucket-type')
   }).pipe(endpoint({objectMode: true}, function (err) {
     // Expect the stream event to fire becore the node event
@@ -360,7 +360,7 @@ test('remove three objects', function (t) {
 
     async.mapSeries(objects, function (val, done) {
       message(node, types.RpbDelReq, {
-        bucket: new Buffer('riak-client-test'),
+        bucket: new Buffer('riakdb-node-test'),
         key: new Buffer(val.key)
       }, done);
     }, function (err, responses) {
