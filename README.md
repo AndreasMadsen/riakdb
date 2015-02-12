@@ -167,19 +167,19 @@ TODO: Document error behaviour and response type patterns
   </tr>
   <tr>
     <td> Fetch Object </td>
-    <td> `client.low.get` </td>
+    <td> <code>client.low.get</code> </td>
     <td> callback </td>
     <td> [RpbGetReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/fetch-object/) </td>
   </tr>
   <tr>
     <td>  Store Object </td>
-    <td> `client.low.put` </td>
+    <td> <code>client.low.put</code> </td>
     <td> callback </td>
     <td> [RpbPutReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/store-object/) </td>
   </tr>
   <tr>
     <td> Delete Object </td>
-    <td> `client.low.del` </td>
+    <td> <code>client.low.del</code> </td>
     <td> callback </td>
     <td> [RpbDelReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/delete-object/) </td>
   </tr>
