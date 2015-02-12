@@ -106,8 +106,7 @@ _Directly uses: [RpbGetReq](http://docs.basho.com/riak/latest/dev/references/pro
 ```javascript
 client.put({
   bucket: new Buffer('bucket-name'),
-  key: new Buffer('key-value'),
-  content: { value: new Buffer('content-value') }
+  key: new Buffer('key-value')
 }, function (err, response) {
   if (err) throw err;
 
@@ -122,7 +121,8 @@ _Directly uses: [RpbPutReq](http://docs.basho.com/riak/latest/dev/references/pro
 ```javascript
 client.get({
   bucket: new Buffer('riakdb-client-test'),
-  key: new Buffer('single key')
+  key: new Buffer('ket-value'),
+  content: { value: new Buffer('content-value') }
 }, function (err, response) {
   if (err) throw err;
 
@@ -137,7 +137,7 @@ _Directly uses: [RpbDelReq](http://docs.basho.com/riak/latest/dev/references/pro
 ```javascript
 client.del({
   bucket: new Buffer('riakdb-client-test'),
-  key: new Buffer('single key')
+  key: new Buffer('key-value')
 }, function (err, response) {
   if (err) throw err;
 
@@ -160,10 +160,10 @@ TODO: Document error behaviour and response type patterns
 </thead>
 <tbody>
   <tr>
-    <td colspan=3> **Bucket Operations** </td>
+    <td colspan=4> <strong>Bucket Operations</strong> </td>
   </tr>
   <tr>
-    <td colspan=3> **Object/Key Operations** </td>
+    <td colspan=4> <strong>Object/Key Operations</strong> </td>
   </tr>
   <tr>
     <td> Fetch Object </td>
@@ -184,19 +184,19 @@ TODO: Document error behaviour and response type patterns
     <td> [RpbDelReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/delete-object/) </td>
   </tr>
   <tr>
-    <td colspan=3> **Query Operations** </td>
+    <td colspan=4> <strong>Query Operations</strong> </td>
   </tr>
   <tr>
-    <td colspan=3> **Server Operations** </td>
+    <td colspan=4> <strong>Server Operations</strong> </td>
   </tr>
   <tr>
-    <td colspan=3> **Bucket Type Operations** </td>
+    <td colspan=4> <strong>Bucket Type Operations</strong> </td>
   </tr>
   <tr>
-    <td colspan=3> **Data Type Operations** </td>
+    <td colspan=4> <strong>Data Type Operations</strong> </td>
   </tr>
   <tr>
-    <td colspan=3> **Yokozuna Operations** </td>
+    <td colspan=4> <strong>Yokozuna Operations</strong> </td>
   </tr>
 </tbody>
 </table>
