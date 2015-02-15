@@ -52,7 +52,7 @@ test('one empty messages', function (t) {
   parser.pipe(endpoint({ objectMode: true }, function (err, items) {
     t.equal(err, null);
     t.deepEqual(buffer2str(items), [{
-      type: 2,
+      type: 'RpbPingResp',
       data: null
     }]);
     t.end();
@@ -67,7 +67,7 @@ test('one complete message', function (t) {
 
   parser.once('readable', function () {
     t.deepEqual(buffer2str(parser.read()), {
-      type: 0,
+      type: 'RpbErrorResp',
       data: {
         errmsg: 'message complete',
         errcode: 1
@@ -79,7 +79,7 @@ test('one complete message', function (t) {
     parser.end();
   });
 
-  parser.write(constructMessage(0, {
+  parser.write(constructMessage('RpbErrorResp', {
     errmsg: new Buffer('message complete'),
     errcode: 1
   }));
@@ -91,7 +91,7 @@ test('partial frame', function (t) {
   parser.pipe(endpoint({ objectMode: true }, function (err, items) {
     t.equal(err, null);
     t.deepEqual(buffer2str(items), [{
-      type: 0,
+      type: 'RpbErrorResp',
       data: {
         errmsg: 'message complete',
         errcode: 1
@@ -100,7 +100,7 @@ test('partial frame', function (t) {
     t.end();
   }));
 
-  var buffer = constructMessage(0, {
+  var buffer = constructMessage('RpbErrorResp', {
     errmsg: new Buffer('message complete'),
     errcode: 1
   });
@@ -117,7 +117,7 @@ test('partial message', function (t) {
   parser.pipe(endpoint({ objectMode: true }, function (err, items) {
     t.equal(err, null);
     t.deepEqual(buffer2str(items), [{
-      type: 0,
+      type: 'RpbErrorResp',
       data: {
         errmsg: 'message complete',
         errcode: 1
@@ -126,7 +126,7 @@ test('partial message', function (t) {
     t.end();
   }));
 
-  var buffer = constructMessage(0, {
+  var buffer = constructMessage('RpbErrorResp', {
     errmsg: new Buffer('message complete'),
     errcode: 1
   });
@@ -142,13 +142,13 @@ test('two complete message', function (t) {
   parser.pipe(endpoint({ objectMode: true }, function (err, items) {
     t.equal(err, null);
     t.deepEqual(buffer2str(items), [{
-      type: 0,
+      type: 'RpbErrorResp',
       data: {
         errmsg: 'message complete A',
         errcode: 1
       }
     }, {
-      type: 0,
+      type: 'RpbErrorResp',
       data: {
         errmsg: 'message complete B',
         errcode: 1
@@ -157,12 +157,12 @@ test('two complete message', function (t) {
     t.end();
   }));
 
-  var bufferA = constructMessage(0, {
+  var bufferA = constructMessage('RpbErrorResp', {
     errmsg: new Buffer('message complete A'),
     errcode: 1
   });
 
-  var bufferB = constructMessage(0, {
+  var bufferB = constructMessage('RpbErrorResp', {
     errmsg: new Buffer('message complete B'),
     errcode: 1
   });
@@ -177,25 +177,25 @@ test('multiply messages (regression)', function (t) {
   parser.pipe(endpoint({ objectMode: true }, function (err, items) {
     t.equal(err, null);
     t.deepEqual(buffer2str(items), [{
-      type: 18,
+      type: 'RpbListKeysResp',
       data: {
         keys: ['A'],
         done: false
       }
     }, {
-      type: 18,
+      type: 'RpbListKeysResp',
       data: {
         keys: ['B'],
         done: false
       }
     }, {
-      type: 18,
+      type: 'RpbListKeysResp',
       data: {
         keys: ['C'],
         done: false
       }
     }, {
-      type: 18,
+      type: 'RpbListKeysResp',
       data: {
         keys: [],
         done: true

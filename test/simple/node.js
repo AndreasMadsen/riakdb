@@ -7,7 +7,6 @@ var PassThrough = require('stream').PassThrough;
 
 var jobs = require('../../lib/job.js');
 var Node = require('../../lib/node.js');
-var types = require('../../lib/types.js');
 
 var settings = {
   address: '127.0.0.1',
@@ -65,7 +64,7 @@ test('ping by simple message', function (t) {
       t.equal(node.inuse, false);
     });
 
-    message(node, types.RpbPingReq, {}, function (err, data) {
+    message(node, 'RpbPingReq', {}, function (err, data) {
       t.equal(err, null);
       t.equal(data, null);
       t.strictEqual(node.inuse, false);
@@ -92,7 +91,7 @@ test('last request timestamp', function (t) {
   node.once('connect', function () {
 
     setTimeout(function () {
-      message(node, types.RpbPingReq, {}, function (err, data) {
+      message(node, 'RpbPingReq', {}, function (err, data) {
         var now = Date.now();
         t.equal(err, null);
         t.equal(data, null);
@@ -111,7 +110,7 @@ test('error for multiply request using message', function (t) {
   node.once('connect', function () {
     var error = null;
 
-    message(node, types.RpbPingReq, {}, function (err, data) {
+    message(node, 'RpbPingReq', {}, function (err, data) {
       t.equal(err, null);
       t.equal(data, null);
       t.equal(error.message, 'node is in use');
@@ -121,7 +120,7 @@ test('error for multiply request using message', function (t) {
       node.once('close', t.end.bind(t));
     });
 
-    message(node, types.RpbPingReq, {}, function (err) {
+    message(node, 'RpbPingReq', {}, function (err) {
       error = err;
     });
   });
@@ -133,7 +132,7 @@ test('error in callback for connection error', function (t) {
 
   var nodeError = null;
 
-  message(node, types.RpbPingReq, {}, function (err, data) {
+  message(node, 'RpbPingReq', {}, function (err, data) {
     // Expect the callback to fire becore the event
     t.equal(nodeError, null);
     t.equal(data, null);
@@ -156,7 +155,7 @@ test('riak errors in the single message case', function (t) {
   var node = new Node(settings);
   node.connect();
   node.once('connect', function () {
-    message(node, types.RpbGetBucketReq, {
+    message(node, 'RpbGetBucketReq', {
       bucket: new Buffer('riakdb-node-test'),
       type: new Buffer('missing-bucket-type')
     }, function (err) {
@@ -175,7 +174,7 @@ test('message requests will fail when closeing', function (t) {
   var node = new Node(settings);
   node.connect();
 
-  message(node, types.RpbListBucketsReq, {}, function (err, response) {
+  message(node, 'RpbListBucketsReq', {}, function (err, response) {
     t.equal(err.message, 'connection closed');
     t.equal(response, null);
 
@@ -196,7 +195,7 @@ test('store three objects', function (t) {
   node.once('connect', function () {
 
     async.mapSeries(objects, function (val, done) {
-      message(node, types.RpbPutReq, {
+      message(node, 'RpbPutReq', {
         bucket: new Buffer('riakdb-node-test'),
         key: new Buffer(val.key),
         content: { value: new Buffer(val.content) }
@@ -221,7 +220,7 @@ test('fetch three objects', function (t) {
   node.once('connect', function () {
 
     async.mapSeries(objects, function (val, done) {
-      message(node, types.RpbGetReq, {
+      message(node, 'RpbGetReq', {
         bucket: new Buffer('riakdb-node-test'),
         key: new Buffer(val.key)
       }, done);
@@ -246,7 +245,7 @@ test('read keys by stream', function (t) {
   node.connect();
   node.once('connect', function () {
 
-    stream(node, types.RpbListKeysReq, {
+    stream(node, 'RpbListKeysReq', {
       bucket: new Buffer('riakdb-node-test')
     }).pipe(endpoint({objectMode: true}, function (err, content) {
       t.equal(err, null);
@@ -272,7 +271,7 @@ test('error for multiply requests using stream', function (t) {
   node.once('connect', function () {
     var error = null;
 
-    stream(node, types.RpbListKeysReq, {
+    stream(node, 'RpbListKeysReq', {
       bucket: new Buffer('riakdb-node-test')
     }).pipe(endpoint({objectMode: true}, function (err, content) {
       t.equal(err, null);
@@ -283,7 +282,7 @@ test('error for multiply requests using stream', function (t) {
       node.once('close', t.end.bind(t));
     }));
 
-    stream(node, types.RpbListKeysReq, {
+    stream(node, 'RpbListKeysReq', {
       bucket: new Buffer('riakdb-node-test')
     }).pipe(endpoint({objectMode: true}, function (err, content) {
       t.equal(content.length, 0);
@@ -296,7 +295,7 @@ test('riak errors in the stream case', function (t) {
   var node = new Node(settings);
   node.connect();
   node.once('connect', function () {
-    stream(node, types.RpbListKeysReq, {
+    stream(node, 'RpbListKeysReq', {
       bucket: new Buffer('riakdb-node-test'),
       type: new Buffer('missing-bucket-type')
     }).pipe(endpoint({objectMode: true}, function (err) {
@@ -315,7 +314,7 @@ test('stream requests will fail when closeing', function (t) {
   var node = new Node(settings);
   node.connect();
 
-  stream(node, types.RpbListKeysReq, {
+  stream(node, 'RpbListKeysReq', {
     bucket: new Buffer('riakdb-node-test')
   }).pipe(endpoint({objectMode: true}, function (err) {
     t.equal(err.message, 'connection closed');
@@ -332,7 +331,7 @@ test('error in stream for connection error', function (t) {
 
   var nodeError = null;
 
-  stream(node, types.RpbListKeysReq, {
+  stream(node, 'RpbListKeysReq', {
     bucket: new Buffer('riakdb-node-test'),
     type: new Buffer('missing-bucket-type')
   }).pipe(endpoint({objectMode: true}, function (err) {
@@ -359,7 +358,7 @@ test('remove three objects', function (t) {
   node.once('connect', function () {
 
     async.mapSeries(objects, function (val, done) {
-      message(node, types.RpbDelReq, {
+      message(node, 'RpbDelReq', {
         bucket: new Buffer('riakdb-node-test'),
         key: new Buffer(val.key)
       }, done);

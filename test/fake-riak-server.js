@@ -48,7 +48,7 @@ FakeRiakServer.prototype._connection = function (socket) {
 
       // Fail on multiply requests
       if (inuse) {
-        socket.write(encode(types.RpbErrorResp, {
+        socket.write(encode('RpbErrorResp', {
           errmsg: new Buffer('Multply requests not supported'),
           errcode: 0
         }));
@@ -56,8 +56,8 @@ FakeRiakServer.prototype._connection = function (socket) {
       }
 
       // Handle ping request, make a small delay
-      if (request.type === types.RpbPingReq) {
-        socket.write(encode(types.RpbPingResp, {}), function () {
+      if (request.type === 'RpbPingReq') {
+        socket.write(encode('RpbPingResp', {}), function () {
           inuse = false;
         });
       }
@@ -72,7 +72,7 @@ function encode(type, data) {
   // message length
   buffer.writeUInt32BE(length, 0, true);
   // message size
-  buffer.writeUInt8(type, 4, true);
+  buffer.writeUInt8(types.str2num[type], 4, true);
   // message content
   protocol[type].encode(data, buffer, 5);
 

@@ -5,7 +5,6 @@ var async = require('async');
 
 var jobs = require('../../lib/job.js');
 var Pool = require('../../lib/pool.js');
-var types = require('../../lib/types.js');
 
 var FakeRiak = require('../fake-riak-cluster.js');
 
@@ -34,7 +33,7 @@ test('requests are queued before connecting', function (t) {
   var pool = new Pool(settings);
 
   var connectCalled = false;
-  message(pool, types.RpbPingReq, {}, function (err, response) {
+  message(pool, 'RpbPingReq', {}, function (err, response) {
     t.equal(err, null);
     t.equal(response, null);
     t.equal(connectCalled, true);
@@ -53,12 +52,12 @@ test('requests will fail after closed', function (t) {
   var pool = new Pool(settings);
   pool.connect();
 
-  message(pool, types.RpbPingReq, {}, function (err1, response1) {
+  message(pool, 'RpbPingReq', {}, function (err1, response1) {
     t.equal(err1, null);
     t.equal(response1, null);
 
     pool.close();
-    message(pool, types.RpbPingReq, {}, function (err2, response2) {
+    message(pool, 'RpbPingReq', {}, function (err2, response2) {
       t.equal(err2.message, 'connection closed');
       t.equal(response2, null);
 
@@ -72,7 +71,7 @@ test('connections are reused', function (t) {
   pool.connect();
 
   async.timesSeries(2, function (index, done) {
-    message(pool, types.RpbPingReq, {}, done);
+    message(pool, 'RpbPingReq', {}, done);
   }, function (err, responses) {
     t.equal(err || null, null);
     t.deepEqual(responses, [null, null]);
@@ -88,7 +87,7 @@ test('with pool two simultaneous messages are possibol', function (t) {
   pool.connect();
 
   async.times(2, function (index, done) {
-    message(pool, types.RpbPingReq, {}, done);
+    message(pool, 'RpbPingReq', {}, done);
   }, function (err, responses) {
     t.equal(err || null, null);
     t.deepEqual(responses, [null, null]);
@@ -103,7 +102,7 @@ test('connections are restored on end', function (t) {
   var pool = new Pool({ minConnections: 1, nodes: settings.nodes });
   pool.connect();
 
-  message(pool, types.RpbPingReq, {}, function (err, response) {
+  message(pool, 'RpbPingReq', {}, function (err, response) {
     t.equal(err, null);
     t.equal(response, null);
 
@@ -123,7 +122,7 @@ test('connections are restored on error', function (t) {
   var pool = new Pool({ minConnections: 1, nodes: settings.nodes });
   pool.connect();
 
-  message(pool, types.RpbPingReq, {}, function (err, response) {
+  message(pool, 'RpbPingReq', {}, function (err, response) {
     t.equal(err, null);
     t.equal(response, null);
 
@@ -174,7 +173,7 @@ test('no more nodes than max connections allow', function (t) {
   pool.connect();
 
   async.times(10, function (index, done) {
-    message(pool, types.RpbPingReq, {}, done);
+    message(pool, 'RpbPingReq', {}, done);
   }, function (err, responses) {
     t.equal(err || null, null);
     t.deepEqual(responses.length, 10);
@@ -199,7 +198,7 @@ test('if more than min connections, some closes after timeout', function (t) {
   // Do 3 requests, such there will be 3 connections will be initialized
   function initializeConnections() {
     async.times(3, function (index, done) {
-      message(pool, types.RpbPingReq, {}, done);
+      message(pool, 'RpbPingReq', {}, done);
     }, function (err, responses) {
       t.equal(err || null, null);
       t.deepEqual(responses.length, 3);
@@ -215,7 +214,7 @@ test('if more than min connections, some closes after timeout', function (t) {
     t.equal(pool.connections, 3);
 
     async.times(2, function (index, done) {
-      message(pool, types.RpbPingReq, {}, done);
+      message(pool, 'RpbPingReq', {}, done);
     }, function (err, responses) {
       t.equal(err || null, null);
       t.deepEqual(responses.length, 2);
