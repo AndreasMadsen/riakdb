@@ -34,12 +34,12 @@ client.keys({ bucket: 'examples' })
 
 The documentation is separated intro three parts:
 
-**[Connection](#Connection)**
+**[Connection](#connection)**
 
-Discusses how to setup and configure the riak connection pool and the
+Discusses how to setup and configure the Riak connection pool and the
 associated events.
 
-**[High level interface](#High-level-interface)**
+**[High level interface](#high-level-interface)**
 
 `riakdb` comes with two interfaces for communicating with Riak. Generally there
 is no difference, however in some cases a convenient abstraction is put around
@@ -53,7 +53,7 @@ item contain just a single key.
 Because of the wast amount of features in Riak, some high level methods may
 not support all the features of the corresponding low level method.
 
-**[Low level interface](#Low-level-interface)**
+**[Low level interface](#low-level-interface)**
 
 To give better backward compatibility and ensure that all features in Riak
 are supported a low level interface is also provided. This is a direct mapping
