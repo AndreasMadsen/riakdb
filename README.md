@@ -103,7 +103,56 @@ TODO: Implement `.keys` as a high level example and document
 
 ### Low level interface
 
-TODO: Document error behaviour and response type patterns
+The low level interface have two response types `callback` and `stream`. In
+both cases the function takes a `request` object as the first argument. There
+are a few exceptions/details to this pattern:
+
+* In some cases there (e.q. `ping`) is no request parameters and thus
+there is no `request` argument.
+
+* Some stream requests, requires you to set a request parameter there makes
+Riak return a stream and not a single message. These are marked with `stream (set)`.
+
+**Example on a `callback` response with a request `argument`**
+
+```javascript
+client.low.get({
+  key: new Buffer('some key'),
+  bucket: new Buffer('some bucket')
+}, function (err, response) {
+  // response is contains the full content
+});
+```
+
+**Example on a `callback` response with no `request` argument**
+
+```javascript
+client.low.ping(function (err, response) {
+  // response is null as there is also no response for `.ping`
+});
+```
+
+**Example on a `stream` response with a request `argument`**
+
+```javascript
+client.low.getKeys({
+  bucket: new Buffer('some bucket')
+}).pipe(output);
+```
+
+**Example on a `stream` response with a required stream parameter**
+
+```javascript
+client.low.getBuckets({
+  stream: true
+}).pipe(output);
+```
+
+**Full list of methods**
+
+This is a complete list of [all the documented Riak requests](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/),
+with a mapping to the _method name_, _response type_ and link to the
+request and response structure (_protocol_).
 
 | Name                       | Method            | Response Type     | Protocol |
 | -------------------------- | ----------------- | ----------------- | -------- |
