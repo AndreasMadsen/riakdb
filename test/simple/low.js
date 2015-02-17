@@ -1,12 +1,14 @@
 'use strict';
 
 var test = require('tap').test;
-var async = require('async');
+var path = require('path');
+var fs = require('fs');
 var mappoint = require('mappoint');
 var endpoint = require('endpoint');
 
 var RiakClient = require('../../lib/client.js');
 
+var schema = fs.readFileSync(path.resolve(__dirname, '../fixture/schema.xml'));
 var settings = {
   nodes: [{
     address: '127.0.0.1',
@@ -21,15 +23,16 @@ test('= start client', function (t) {
   client.once('connect', t.end.bind(t));
 });
 
+var itemValue = JSON.stringify({ key1: 'test', key2: 'abc 123' });
 test('= Object/Key Operations - part 1/2', function (tt) {
   tt.test('low.put', function (t) {
     client.low.put({
       bucket: new Buffer('riakdb-low-test'),
       key: new Buffer('single key'),
       content: {
-        'value': new Buffer('single content'),
+        'value': new Buffer(itemValue),
         'charset': new Buffer('utf-8'),
-        'content_type': new Buffer('text/plain'),
+        'content_type': new Buffer('application/json'),
         'indexes': [
           { key: new Buffer('2i_bin'), value: new Buffer('2i value') }
         ]
@@ -47,7 +50,7 @@ test('= Object/Key Operations - part 1/2', function (tt) {
       key: new Buffer('single key')
     }, function (err, response) {
       t.equal(err, null);
-      t.equal(response.content[0].value.toString(), 'single content');
+      t.equal(response.content[0].value.toString(), itemValue);
       t.end();
     });
   });
@@ -134,6 +137,99 @@ test('= Bucket Operations', function (tt) {
   tt.end();
 });
 
+test('= Yokozuna Operations - part 1/2', function (tt) {
+  tt.test('low.putSearchSchema', function (t) {
+    client.low.putSearchSchema({
+      schema: {
+        name: new Buffer('riakdb-low-schema'),
+        content: schema
+      }
+    }, function (err, response) {
+      t.equal(err, null);
+      t.deepEqual(response, { content: [], vclock: null, key: null });
+
+      t.end();
+    });
+  });
+
+  tt.test('low.getSearchSchema', function (t) {
+    client.low.getSearchSchema({
+      name: new Buffer('riakdb-low-schema')
+    }, function (err, response) {
+      t.equal(err, null);
+      t.equal(response.schema.name.toString(), 'riakdb-low-schema');
+      t.equal(response.schema.content.toString(), schema.toString());
+
+      t.end();
+    });
+  });
+
+  tt.test('low.putSearchIndex', function (t) {
+    client.low.putSearchIndex({
+      index: {
+        name: new Buffer('riakdb-low-search'),
+        schema: new Buffer('riakdb-low-schema')
+      }
+    }, function (err, response) {
+      t.equal(err, null);
+      t.deepEqual(response, { content: [], vclock: null, key: null });
+      t.end();
+    });
+  });
+
+  tt.test('low.getSearchIndex', function (t) {
+    (function retry() {
+      client.low.getSearchIndex({
+        name: new Buffer('riakdb-low-search')
+      }, function (err, response) {
+        // It takes some time for riak to catch up on a search index
+        if ((err && err.message === 'notfound') || response.index.length === 0) {
+          return setTimeout(retry, 100);
+        }
+
+        t.equal(err, null);
+        t.equal(response.index[0].name.toString(), 'riakdb-low-search');
+        t.equal(response.index[0].schema.toString(), 'riakdb-low-schema');
+        t.end();
+      });
+    })();
+  });
+
+  tt.test('enable search index', function (t) {
+    client.low.setBucket({
+      bucket: new Buffer('riakdb-low-test'),
+      props: {
+          'search_index': new Buffer('riakdb-low-search')
+      }
+    }, function (err, response) {
+      t.equal(err, null);
+      t.equal(response, null);
+      t.end();
+    });
+  });
+
+  tt.test('refresh bucket', function (t) {
+    client.low.get({
+      bucket: new Buffer('riakdb-low-test'),
+      key: new Buffer('single key')
+    }, function (err1, response1) {
+      t.equal(err1, null);
+      t.type(response1.content[0], 'object');
+      client.low.put({
+        bucket: new Buffer('riakdb-low-test'),
+        key: new Buffer('single key'),
+        content: response1.content[0]
+      }, function (err2, response2) {
+        t.equal(err2, null);
+        t.deepEqual(response2, { content: [], vclock: null, key: null });
+        t.end();
+      });
+    });
+  });
+
+  tt.end();
+});
+
 test('= Query Operations', function (tt) {
   tt.test('low.mapred', function (t) {
     client.low.mapred({
@@ -155,7 +251,7 @@ test('= Query Operations', function (tt) {
     .pipe(endpoint({ objectMode: true }, function (err, response) {
       t.equal(err, null);
       var buckets = Array.prototype.concat.apply([], response);
-      t.deepEqual(buckets, ['single content']);
+      t.deepEqual(buckets, [itemValue]);
       t.end();
     }));
   });
@@ -182,7 +278,55 @@ test('= Query Operations', function (tt) {
   });
 
   tt.test('low.search', function (t) {
-    t.end();
+    (function retry() {
+      client.low.search({
+        q: new Buffer('key1:test AND key2:abc'),
+        index: new Buffer('riakdb-low-search')
+      }, function (err, response) {
+        if (response.docs.length === 0) return setTimeout(retry, 100);
+        t.equal(err, null);
+        t.equal(response.num_found, 1);
+        t.equal(response.docs.length, 1);
+
+        var fields = response.docs[0].fields.map(function (item) {
+          return { key: item.key.toString(), value: item.value.toString() };
+        }).sort(function (a, b) {
+          return a.key > b.key;
+        });
+
+        t.deepEqual(fields[1], { key: '_yz_rb', value: 'riakdb-low-test' });
+        t.deepEqual(fields[2], { key: '_yz_rk', value: 'single key' });
+        t.deepEqual(fields[3], { key: '_yz_rt', value: 'default' });
+        t.deepEqual(fields[4], { key: 'key1', value: 'test' });
+        t.deepEqual(fields[5], { key: 'key2', value: 'abc 123' });
+
+        t.end();
+      });
+    })();
+  });
+
+  tt.end();
+});
+
+test('= Yokozuna Operations - part 2/2', function (tt) {
+  tt.test('disable search index', function (t) {
+    client.low.resetBucket({
+      bucket: new Buffer('riakdb-low-test')
+    }, function (err, response) {
+      t.equal(err, null);
+      t.equal(response, null);
+      t.end();
+    });
+  });
+
+  tt.test('low.delSearchSchema', function (t) {
+    client.low.delSearchIndex({
+      name: new Buffer('riakdb-low-search')
+    }, function (err, response) {
+      t.equal(err, null);
+      t.equal(response, null);
+      t.end();
+    });
   });
 
   tt.end();
