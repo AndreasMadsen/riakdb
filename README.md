@@ -99,107 +99,47 @@ client.close();
 
 ### High level interface
 
-#### client.get(request, callback)
-
-_Directly uses: [RpbGetReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/fetch-object/)_
-
-```javascript
-client.put({
-  bucket: new Buffer('bucket-name'),
-  key: new Buffer('key-value')
-}, function (err, response) {
-  if (err) throw err;
-
-  console.log(response);
-});
-```
-
-#### client.put(request, callback)
-
-_Directly uses: [RpbPutReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/store-object/)_
-
-```javascript
-client.get({
-  bucket: new Buffer('riakdb-client-test'),
-  key: new Buffer('ket-value'),
-  content: { value: new Buffer('content-value') }
-}, function (err, response) {
-  if (err) throw err;
-
-  console.log(response);
-});
-```
-
-#### client.del(request, callback)
-
-_Directly uses: [RpbDelReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/delete-object/)_
-
-```javascript
-client.del({
-  bucket: new Buffer('riakdb-client-test'),
-  key: new Buffer('key-value')
-}, function (err, response) {
-  if (err) throw err;
-
-  console.log(response);
-});
-```
+TODO: Implement `.keys` as a high level example and document
 
 ### Low level interface
 
 TODO: Document error behaviour and response type patterns
 
-<table>
-<thead>
-  <tr>
-    <th> Name </th>
-    <th> Method </th>
-    <th> Response Type </th>
-    <th> Protocol </th>
-  <tr>
-</thead>
-<tbody>
-  <tr>
-    <td colspan=4> <strong>Bucket Operations</strong> </td>
-  </tr>
-  <tr>
-    <td colspan=4> <strong>Object/Key Operations</strong> </td>
-  </tr>
-  <tr>
-    <td> Fetch Object </td>
-    <td> <code>client.low.get</code> </td>
-    <td> callback </td>
-    <td> [RpbGetReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/fetch-object/) </td>
-  </tr>
-  <tr>
-    <td>  Store Object </td>
-    <td> <code>client.low.put</code> </td>
-    <td> callback </td>
-    <td> [RpbPutReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/store-object/) </td>
-  </tr>
-  <tr>
-    <td> Delete Object </td>
-    <td> <code>client.low.del</code> </td>
-    <td> callback </td>
-    <td> [RpbDelReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/delete-object/) </td>
-  </tr>
-  <tr>
-    <td colspan=4> <strong>Query Operations</strong> </td>
-  </tr>
-  <tr>
-    <td colspan=4> <strong>Server Operations</strong> </td>
-  </tr>
-  <tr>
-    <td colspan=4> <strong>Bucket Type Operations</strong> </td>
-  </tr>
-  <tr>
-    <td colspan=4> <strong>Data Type Operations</strong> </td>
-  </tr>
-  <tr>
-    <td colspan=4> <strong>Yokozuna Operations</strong> </td>
-  </tr>
-</tbody>
-</table>
+| Name                       | Method            | Response Type     | Protocol |
+| -------------------------- | ----------------- | ----------------- | -------- |
+| **Bucket Operations**      |                   |                   |
+| List Buckets               | `getBuckets`      | stream (must set) | [RpbListBucketsReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/list-buckets/)
+| List Keys                  | `getKeys`         | stream            | [RpbListKeysReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/list-keys/)
+| Get Bucket Properties      | `getBucket`       | callback          | [RpbGetBucketReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/get-bucket-props/)
+| Set Bucket Properties      | `setBucket`       | callback          | [RpbSetBucketReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/set-bucket-props/)
+| Reset Bucket Properties    | `resetBucket`     | callback          | [RpbResetBucketReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/reset-bucket-props/)
+| **Object/Key Operations**  |                   |                   |
+| Fetch Object               | `get`             | callback          | [RpbGetReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/fetch-object/)
+| Store Object               | `put`             | callback          | [RpbPutReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/store-object/)
+| Delete Object              | `del`             | callback          | [RpbDelReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/delete-object/)
+| **Query Operations**       |                   |                   |
+| MapReduce                  | `mapred`          | stream            | [RpbMapRedReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/mapreduce/)
+| Secondary Indexes          | `getIndex`        | stream (must set) | [RpbIndexReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/secondary-indexes/)
+| Search                     | `search`          | callback          | [RpbSearchQueryReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/search/)
+| **Server Operations**      |                   |                   |
+| Ping                       | `ping`            | callback          | [RpbPingReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/ping/)
+| Server Info                | `getServerInfo`   | callback          | [RpbGetServerInfoReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/server-info/)
+| **Bucket Type Operations** |                   |                   |
+| Get Bucket Type            | `getBucketType`   | callback          | [RpbGetBucketTypeReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/get-bucket-type/)
+| Set Bucket Type            | `setBucketType`   | callback          | [RpbSetBucketTypeReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/set-bucket-type/)
+| **Data Type Operations**   |                   |                   |
+| Data Type Fetch            | `getCrdt`         | callback          | [DtFetchReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/dt-fetch/)
+| Data Type Union            | not implemented   | callback          | [DtOp](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/dt-union/)
+| Data Type Store            | `putCrdt`         | callback          | [DtUpdateReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/dt-store/)
+| Data Type Counter Store    | not implemented   | callback          | [CounterOp](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/dt-counter-store/)
+| Data Type Set Store        | not implemented   | callback          | [SetOp](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/dt-set-store/)
+| Data Type Map Store        | not implemented   | callback          | [MapOp](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/dt-map-store/)
+| **Yokozuna Operations**    |                   |                   |
+| Yokozuna Index Get         | `getSearchIndex`  | callback          | [RpbYokozunaIndexGetReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/yz-index-get/)
+| Yokozuna Index Put         | `putSearchIndex`  | callback          | [RpbYokozunaIndexPutReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/yz-index-put/)
+| Yokozuna Index Delete      | `delSearchIndex`  | callback          | [RpbYokozunaIndexDeleteReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/yz-index-delete/)
+| Yokozuna Schema Get        | `getSearchSchema` | callback          | [RpbYokozunaSchemaGetReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/yz-schema-get/)
+| Yokozuna Schema Put        | `putSearchSchema` | callback          | [RpbYokozunaSchemaPutReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/yz-schema-put/)
 
 ## License
 
