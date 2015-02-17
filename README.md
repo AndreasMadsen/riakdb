@@ -20,14 +20,13 @@ var client = riakdb({
 });
 
 client.connect();
-client.keys({ bucket: 'examples' })
+client.getKeys({ bucket: 'examples' })
   .on('data', function (key) {
     console.log(key);
   })
   .once('end', function () {
     client.close();
   });
-
 ```
 
 ## Documentation
