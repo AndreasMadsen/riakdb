@@ -332,6 +332,122 @@ test('= Yokozuna Operations - part 2/2', function (tt) {
   tt.end();
 });
 
+test('= Object/Key Operations - part 2/2', function (tt) {
+  tt.test('low.del', function (t) {
+    client.low.del({
+      bucket: new Buffer('riakdb-low-test'),
+      key: new Buffer('single key')
+    }, function (err, response) {
+      t.equal(err, null);
+      t.equal(response, null);
+      t.end();
+    });
+  });
+
+  tt.end();
+});
+
+// Remember to create and active the bucket type used for testing
+// riak-admin bucket-type create riakdb-low-buckettype \
+//    '{"props": {"allow_mult": true, "datatype": "counter"}}'
+// riak-admin bucket-type activate riakdb-low-buckettype
+test('= Bucket Type Operations', function (tt) {
+  tt.test('low.setBucketType', function (t) {
+    client.low.setBucketType({
+      type: new Buffer('riakdb-low-buckettype'),
+      props: {
+        'n_val': 4
+      }
+    }, function (err, response) {
+      t.equal(err, null);
+      t.equal(response, null);
+      t.end();
+    });
+  });
+
+  tt.test('low.getBucketType', function (t) {
+    client.low.getBucketType({
+      type: new Buffer('riakdb-low-buckettype')
+    }, function (err, response) {
+      t.equal(err, null);
+      t.equal(response.props.n_val, 4);
+      t.end();
+    });
+  });
+
+  tt.test('reset bucket type', function (t) {
+    client.low.setBucketType({
+      type: new Buffer('riakdb-low-buckettype'),
+      props: {
+        'n_val': 3
+      }
+    }, function (err, response) {
+      t.equal(err, null);
+      t.equal(response, null);
+      t.end();
+    });
+  });
+
+  tt.end();
+});
+
+test('= Data Type Operations', function (tt) {
+  tt.test('low.putCrdt', function (t) {
+    client.low.putCrdt({
+      bucket: new Buffer('riakdb-low-test'),
+      type: new Buffer('riakdb-low-buckettype'),
+      key: new Buffer('counter'),
+      op: {
+        'counter_op': { increment: 1 }
+      }
+    }, function (err, response) {
+      t.equal(err, null);
+      t.deepEqual(response, {
+        'key': null,
+        'context': null,
+        'counter_value': 0,
+        'set_value': [],
+        'map_value': []
+      });
+      t.end();
+    });
+  });
+
+  tt.test('low.getCrdt', function (t) {
+    client.low.getCrdt({
+      bucket: new Buffer('riakdb-low-test'),
+      type: new Buffer('riakdb-low-buckettype'),
+      key: new Buffer('counter')
+    }, function (err, response) {
+      t.equal(err, null);
+      t.deepEqual(response, {
+        context: null,
+        type: 1,
+        value: {
+          'counter_value': 1,
+          'set_value': [],
+          'map_value': []
+        }
+      });
+      t.end();
+    });
+  });
+
+  tt.test('delete counter', function (t) {
+    client.low.del({
+      bucket: new Buffer('riakdb-low-test'),
+      type: new Buffer('riakdb-low-buckettype'),
+      key: new Buffer('counter')
+    }, function (err, response) {
+      t.equal(err, null);
+      t.equal(response, null);
+      t.end();
+    });
+  });
+
+  tt.end();
+});
+
 test('= Server Operations', function (tt) {
   tt.test('low.ping', function (t) {
     client.low.ping(function (err, response) {
@@ -345,21 +461,6 @@ test('= Server Operations', function (tt) {
     client.low.getServerInfo(function (err, response) {
       t.equal(err, null);
       t.equal(response.node.toString(), 'riak@127.0.0.1');
-      t.end();
-    });
-  });
-
-  tt.end();
-});
-
-test('= Object/Key Operations - part 2/2', function (tt) {
-  tt.test('low.del', function (t) {
-    client.low.del({
-      bucket: new Buffer('riakdb-low-test'),
-      key: new Buffer('single key')
-    }, function (err, response) {
-      t.equal(err, null);
-      t.equal(response, null);
       t.end();
     });
   });
