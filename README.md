@@ -108,7 +108,7 @@ TODO: Document error behaviour and response type patterns
 | Name                       | Method            | Response Type     | Protocol |
 | -------------------------- | ----------------- | ----------------- | -------- |
 | **Bucket Operations**      |                   |                   |
-| List Buckets               | `getBuckets`      | stream (must set) | [RpbListBucketsReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/list-buckets/)
+| List Buckets               | `getBuckets`      | stream (set)      | [RpbListBucketsReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/list-buckets/)
 | List Keys                  | `getKeys`         | stream            | [RpbListKeysReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/list-keys/)
 | Get Bucket Properties      | `getBucket`       | callback          | [RpbGetBucketReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/get-bucket-props/)
 | Set Bucket Properties      | `setBucket`       | callback          | [RpbSetBucketReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/set-bucket-props/)
@@ -119,7 +119,7 @@ TODO: Document error behaviour and response type patterns
 | Delete Object              | `del`             | callback          | [RpbDelReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/delete-object/)
 | **Query Operations**       |                   |                   |
 | MapReduce                  | `mapred`          | stream            | [RpbMapRedReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/mapreduce/)
-| Secondary Indexes          | `getIndex`        | stream (must set) | [RpbIndexReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/secondary-indexes/)
+| Secondary Indexes          | `getIndex`        | stream (set)      | [RpbIndexReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/secondary-indexes/)
 | Search                     | `search`          | callback          | [RpbSearchQueryReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/search/)
 | **Server Operations**      |                   |                   |
 | Ping                       | `ping`            | callback          | [RpbPingReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/ping/)
