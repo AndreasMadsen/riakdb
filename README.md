@@ -140,7 +140,21 @@ also be notified.
 
 ### High level interface
 
-TODO: Implement `.keys` as a high level example and document
+#### client.getKeys(request)
+
+A depaginized version of `client.low.getKeys`. This means that each stream item
+contains only one key. This is different from the direct protocol mapping, where
+each item can contain multiply keys.
+
+```javascript
+client.getKeys({
+  bucket: 'bucket-name', // required, the bucket name within the bucket type
+  type: 'type-name', // optional, default is 'default'
+  timeout: Number, // undocumented riak option
+}).on('data', function (key) {
+  // `key` is buffer
+});
+```
 
 ### Low level interface
 
