@@ -140,6 +140,9 @@ also be notified.
 
 ### High level interface
 
+Note that if there is no defined high level function, then the same method
+definitions there is in `client.low[method]` also exists in `client[method]`.
+
 #### client.getKeys(request)
 
 A depaginized version of `client.low.getKeys`. This means that each stream item
