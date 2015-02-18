@@ -10,13 +10,19 @@ npm install riakdb
 
 ## Example
 
+Using `riakdb` is simple. Create the client, call `.connect` and make the
+requests. It is important to note that `riakdb` comes with two interfaces.
+
+* A low level interface, there directly maps to the Riak protocol
+* A high level interface, made for node.js
+
 ```javascript
 var riakdb = require('riakdb');
 var client = riakdb({
-  nodes: [
+  nodes: [{
     address: '127.0.0.1',
     port: 8087
-  ]
+  }]
 });
 
 client.connect();
@@ -65,18 +71,36 @@ the encoding and decoding behaviour is defined by that.
 
 #### client = RiakClient(settings)
 
+The main export from `riakdb` is the `RiakClient` constructor function.
+The constructor takes a settings object with some required and some
+optional properties.
+
 ```javascript
 var riakdb = require('riakdb');
 
 var client = riakdb({
-  nodes: [
+  nodes: [{
     address: '127.0.0.1',
     port: 8087
-  ]
+  }]
 });
-
-client.connect();
 ```
+
+The `settings` object takes the following properties:
+
+* `nodes` (required): An array of address objects, these objects are used in the
+[`net.connect`](https://iojs.org/api/net.html#net_net_connect_options_connectionlistener)
+function and thus takes the same arguments. But usually you only need `address`
+and `port`.
+* `minConnections` (default 0): The minimum amount of connection there should
+always exists. It is possible to have more connections, but these will only
+be created when the amount of parallel requests exceeds `minConnections`.
+* `maxConnections` (default 20): The maximum amount of requests. If all
+connections are in use and `maxConnections` prevents more connections from being
+created. Then the requests will be buffered.
+* `connectionTimeout` (default 60000, 1 min): If a connection haven't made any
+requests within `connectionTimeout` ms and there is than `minConnections` active
+connections, then this connection will be closed.
 
 #### client.connect()
 
@@ -84,17 +108,35 @@ client.connect();
 client.connect();
 ```
 
+The client won't start connecting before `client.connect()` is called. Until
+then requests will be buffered.
+
 #### client.close()
 
 ```javascript
 client.close();
 ```
 
+When `client.close()` is called, all connections are closed. This means that
+active requests won't get a response, but they will get an error. Buffered
+requests will also not be send.
+
 #### client.on('connect')
+
+When the `minConnections` amount of connections are created then this event
+is fired. If `minConnections` is zero, then the `connect` event is fired on
+the next tick.
 
 #### client.on('close')
 
+When all connections are closed after a `client.close()` call, then this event
+will fire.
+
 #### client.on('error')
+
+Errors there happens on the connection sockets will be emitted here. If there
+is an active request on that connection then the `stream` or `callback` will
+also be notified.
 
 ### High level interface
 
