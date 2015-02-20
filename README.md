@@ -236,11 +236,7 @@ request and response structure (_protocol_).
 | Set Bucket Type            | `setBucketType`   | callback          | [RpbSetBucketTypeReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/set-bucket-type/)
 | **Data Type Operations**   |                   |                   |
 | Data Type Fetch            | `getCrdt`         | callback          | [DtFetchReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/dt-fetch/)
-| Data Type Union            | not implemented   | callback          | [DtOp](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/dt-union/)
 | Data Type Store            | `putCrdt`         | callback          | [DtUpdateReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/dt-store/)
-| Data Type Counter Store    | not implemented   | callback          | [CounterOp](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/dt-counter-store/)
-| Data Type Set Store        | not implemented   | callback          | [SetOp](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/dt-set-store/)
-| Data Type Map Store        | not implemented   | callback          | [MapOp](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/dt-map-store/)
 | **Yokozuna Operations**    |                   |                   |
 | Yokozuna Index Get         | `getSearchIndex`  | callback          | [RpbYokozunaIndexGetReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/yz-index-get/)
 | Yokozuna Index Put         | `putSearchIndex`  | callback          | [RpbYokozunaIndexPutReq](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/yz-index-put/)
