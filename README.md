@@ -159,6 +159,41 @@ client.getKeys({
 });
 ```
 
+#### client.getIndex(request)
+
+A depaginized version of `client.low.getIndex`. By default each item will
+contain a key. This abstraction does not support `continuation`. If you need
+this please make a pull request or use `client.low.getIndex`.
+
+```javascript
+client.getIndex({
+  bucket: 'riakdb-client-getindex', // required
+  index: '2i_bin', // required, the secondary index to lookup in
+  qtype: 'range', // required, automatically converted to a number
+  min_range: 'A',
+  max_range: 'Z'
+}).on('data', function (key) {
+  // `key` is a buffer with the item key
+});
+```
+
+If `return_terms` is used each item is an object with the
+`getIndex` pair.
+
+```javascript
+client.getIndex({
+  bucket: 'riakdb-client-getindex', // required
+  index: '2i_bin', // required, the secondary index to lookup in
+  qtype: 'range', // required, automatically converted to a number
+  min_range: 'A',
+  max_range: 'Z',
+  return_terms: true // optional, result pairs are returned instead of keys
+}).on('data', function (pair) {
+  // `pair.key` is a buffer with the secondary index value
+  // `pair.value` is a buffer with the item key
+});
+```
+
 ### Low level interface
 
 The low level interface have two response types `callback` and `stream`. In

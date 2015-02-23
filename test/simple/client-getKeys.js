@@ -23,10 +23,10 @@ test('start client', function (t) {
 test('populate database', function (t) {
   async.times(10, function (index, done) {
     client.low.put({
-      bucket: new Buffer('riakdb-client-getkeys'),
-      key: new Buffer('key:' + index),
+      bucket: 'riakdb-client-getkeys',
+      key: 'key:' + index,
       content: {
-        'value': new Buffer('value:' + index)
+        'value': 'value:' + index
       }
     }, done);
   }, function (err) {
@@ -56,10 +56,10 @@ test('client.getKeys', function (t) {
 });
 
 test('cleanup database', function (t) {
-  async.times(10 || null, function (index, done) {
+  async.times(10, function (index, done) {
     client.low.del({
-      bucket: new Buffer('riakdb-client-getkeys'),
-      key: new Buffer('key:' + index)
+      bucket: 'riakdb-client-getkeys',
+      key: 'key:' + index
     }, done);
   }, function (err) {
     t.equal(err || null, null);
