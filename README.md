@@ -1,6 +1,6 @@
 #riakdb
 
-> Simple riak client
+> Riak client with stream interfaces using protocol buffers
 
 ## Installation
 
