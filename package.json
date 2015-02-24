@@ -1,7 +1,7 @@
 {
   "name": "riakdb",
   "description": "riak client with stream interfaces using protocol buffers",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "author": "Andreas Madsen <amwebdk@gmail.com>",
   "main": "./lib/client.js",
   "scripts": {
