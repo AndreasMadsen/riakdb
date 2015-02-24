@@ -19,14 +19,14 @@
     "stream"
   ],
   "dependencies": {
-    "protocol-buffers": "2.5.x",
+    "protocol-buffers": "2.6.x",
     "util-extend": "1.0.x",
     "xorshift": "0.2.x",
     "async": "0.9.x"
   },
   "devDependencies": {
-    "tap": "0.5.x",
-    "eslint": "0.13.x",
+    "tap": "0.6.x",
+    "eslint": "0.15.x",
     "endpoint": "0.4.x"
   },
   "license": "MIT"

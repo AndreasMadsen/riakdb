@@ -194,6 +194,33 @@ client.getIndex({
 });
 ```
 
+#### client.mapred(request)
+
+`client.mapred` takes a `request` object, this will be used as the `request`
+filed in [`RpbMapRedReq`](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/mapreduce/)
+where `content_type` is also set to `application/json`. The other `content_type`,
+`application/x-erlang-binary` is not supported, if you need this make a pull
+request or use `client.low.mapred`.
+
+`client.mapred` expects the response to be `JSON` encoded. The response is
+parsed and depaginized, such that each stream item contains the `phase` number
+and a single `response` object.
+
+```javascript
+client.mapred({
+  inputs: 'riakdb-client-mapred',
+  query: [{
+    map: {
+      language: "javascript",
+      name: "Riak.mapValuesJson"
+    }
+  }]
+}).on('data', function (item) {
+  // item.phase
+  // item.response
+});
+```
+
 ### Low level interface
 
 The low level interface have two response types `callback` and `stream`. In
