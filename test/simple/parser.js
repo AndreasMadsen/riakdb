@@ -66,6 +66,7 @@ test('one complete message', function (t) {
   var parser = new MessageParser();
 
   parser.once('readable', function () {
+    console.log('readable 1');
     t.deepEqual(buffer2str(parser.read()), {
       type: 'RpbErrorResp',
       data: {
@@ -74,7 +75,9 @@ test('one complete message', function (t) {
       }
     });
 
-    parser.once('readable', t.fail.bind(t, 'readable should only fire once'));
+    parser.once('readable', function () {
+      t.equal(parser.read(), null);
+    });
     parser.once('end', t.end.bind(t));
     parser.end();
   });

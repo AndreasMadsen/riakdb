@@ -138,8 +138,8 @@ test('error in callback for connection error', function (t) {
     t.equal(data, null);
 
     process.nextTick(function () {
-      t.equal(err.message, 'connect ECONNREFUSED');
-      t.equal(nodeError.message, 'connect ECONNREFUSED');
+      t.equal(err.message, 'connect ECONNREFUSED 127.0.0.1:2989');
+      t.equal(nodeError.message, 'connect ECONNREFUSED 127.0.0.1:2989');
 
       node.close();
       node.once('close', t.end.bind(t));
@@ -339,8 +339,8 @@ test('error in stream for connection error', function (t) {
     t.equal(nodeError, null);
 
     process.nextTick(function () {
-      t.equal(err.message, 'connect ECONNREFUSED');
-      t.equal(nodeError.message, 'connect ECONNREFUSED');
+      t.equal(err.message, 'connect ECONNREFUSED 127.0.0.1:2989');
+      t.equal(nodeError.message, 'connect ECONNREFUSED 127.0.0.1:2989');
 
       node.close();
       node.once('close', t.end.bind(t));
@@ -377,7 +377,7 @@ test('error at connection without active job', function (t) {
   node.connect();
 
   node.once('error', function (err) {
-    t.equal(err.message, 'connect ECONNREFUSED');
+    t.equal(err.message, 'connect ECONNREFUSED 127.0.0.1:2989');
 
     node.close();
     node.once('close', t.end.bind(t));
