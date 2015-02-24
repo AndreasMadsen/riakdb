@@ -50,7 +50,7 @@ associated events.
 is no difference, however in some cases a convenient abstraction is put around
 the underlying low level interace, to make it easier to use.
 
-An example of this is the `.keys(request)` (stream of all keys in bucket). In
+An example of this is the `.getKeys(request)` (stream of all keys in bucket). In
 this case Riak returns a paginated stream, meaning that each item can contain
 multiply keys. The high level interface performs a depagination such that each
 item contain just a single key.
