@@ -121,6 +121,17 @@ When `client.close()` is called, all connections are closed. This means that
 active requests won't get a response, but they will get an error. Buffered
 requests will also not be send.
 
+#### client.enums
+
+`client.enums` contains the enum objects associated with the riak protocol
+buffer message definitions. The enum objects are:
+
+* `RpbReplMode`
+* `MapFieldType`
+* `DataType`
+* `FlagOp`
+* `IndexQueryType`
+
 #### client.on('connect')
 
 When the `minConnections` amount of connections are created then this event
