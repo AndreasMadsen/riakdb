@@ -11,10 +11,10 @@ var FakeRiak = require('../fake-riak-cluster.js');
 var cluster = new FakeRiak([0x0BAD, 0x1BAD]);
 var settings = {
   nodes: [{
-    address: '127.0.0.1',
+    host: '127.0.0.1',
     port: 0x0BAD
   }, {
-    address: '127.0.0.1',
+    host: '127.0.0.1',
     port: 0x1BAD
   }]
 };

@@ -9,7 +9,7 @@ var jobs = require('../../lib/job.js');
 var Node = require('../../lib/node.js');
 
 var settings = {
-  address: '127.0.0.1',
+  host: '127.0.0.1',
   port: 8087
 };
 
@@ -127,7 +127,7 @@ test('error for multiply request using message', function (t) {
 });
 
 test('error in callback for connection error', function (t) {
-  var node = new Node({ address: '127.0.0.1', port: 0xBAD });
+  var node = new Node({ host: '127.0.0.1', port: 0xBAD });
   node.connect();
 
   var nodeError = null;
@@ -326,7 +326,7 @@ test('stream requests will fail when closeing', function (t) {
 });
 
 test('error in stream for connection error', function (t) {
-  var node = new Node({ address: '127.0.0.1', port: 0xBAD });
+  var node = new Node({ host: '127.0.0.1', port: 0xBAD });
   node.connect();
 
   var nodeError = null;
@@ -373,7 +373,7 @@ test('remove three objects', function (t) {
 });
 
 test('error at connection without active job', function (t) {
-  var node = new Node({ address: '127.0.0.1', port: 0xBAD });
+  var node = new Node({ host: '127.0.0.1', port: 0xBAD });
   node.connect();
 
   node.once('error', function (err) {

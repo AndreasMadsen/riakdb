@@ -9,7 +9,7 @@ var Node = require('../../lib/node.js');
 var RiakClient = require('../../lib/client.js');
 
 var nodes = [{
-  address: '127.0.0.1',
+  host: '127.0.0.1',
   port: 8087
 }];
 */

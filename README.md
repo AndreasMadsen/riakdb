@@ -20,7 +20,7 @@ requests. It is important to note that `riakdb` comes with two interfaces.
 var riakdb = require('riakdb');
 var client = riakdb({
   nodes: [{
-    address: '127.0.0.1',
+    host: '127.0.0.1',
     port: 8087
   }]
 });
@@ -80,7 +80,7 @@ var riakdb = require('riakdb');
 
 var client = riakdb({
   nodes: [{
-    address: '127.0.0.1',
+    host: '127.0.0.1',
     port: 8087
   }]
 });
@@ -90,7 +90,7 @@ The `settings` object takes the following properties:
 
 * `nodes` (required): An array of address objects, these objects are used in the
 [`net.connect`](https://iojs.org/api/net.html#net_net_connect_options_connectionlistener)
-function and thus takes the same arguments. But usually you only need `address`
+function and thus takes the same arguments. But usually you only need `host`
 and `port`.
 * `minConnections` (default 0): The minimum amount of connection there should
 always exists. It is possible to have more connections, but these will only

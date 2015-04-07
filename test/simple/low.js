@@ -11,7 +11,7 @@ var RiakClient = require('../../lib/client.js');
 var schema = fs.readFileSync(path.resolve(__dirname, '../fixture/schema.xml'));
 var settings = {
   nodes: [{
-    address: '127.0.0.1',
+    host: '127.0.0.1',
     port: 8087
   }]
 };
