@@ -238,7 +238,7 @@ The low level interface have two response types `callback` and `stream`. In
 both cases the function takes a `request` object as the first argument. There
 are a few exceptions/details to this pattern:
 
-* In some cases there (e.q. `ping`) is no request parameters and thus
+* In some cases (e.q. `ping`) there is no request parameters and thus
 there is no `request` argument.
 
 * Some stream requests, requires you to set a request parameter there makes
