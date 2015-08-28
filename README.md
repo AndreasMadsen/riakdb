@@ -208,7 +208,7 @@ client.getIndex({
 #### client.mapred(request)
 
 `client.mapred` takes a `request` object, this will be used as the `request`
-filed in [`RpbMapRedReq`](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/mapreduce/)
+field in [`RpbMapRedReq`](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/mapreduce/)
 where `content_type` is also set to `application/json`. The other `content_type`,
 `application/x-erlang-binary` is not supported, if you need this make a pull
 request or use `client.low.mapred`.
